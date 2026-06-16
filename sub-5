@@ -1,0 +1,9 @@
+#profile-title: Velion
+#profile-update-interval: 12
+hysteria2://a163bab8-34ae-4d6a-bfd1-5eaaf403a4a4@be1.velion.pw:8443/?sni=be1.velion.pw#%F0%9F%87%A7%F0%9F%87%AA%20Velion%20BE-01
+hysteria2://6acc3f68-ed61-489c-a8f7-5e53797db22a@de1.velion.pw:8443/?sni=de1.velion.pw#%F0%9F%87%A9%F0%9F%87%AA%20Velion%20DE-02
+hysteria2://5a27f3c0-7c0b-4bda-abaa-bf96712a0cc7@dk1.velion.pw:8443/?sni=dk1.velion.pw#%F0%9F%87%A9%F0%9F%87%B0%20Velion%20DK-01
+hysteria2://e147ea33-7a27-4073-b33c-dfb91c5c7063@ee1.velion.pw:8443/?sni=ee1.velion.pw#%F0%9F%87%AA%F0%9F%87%AA%20Velion%20EE-02
+hysteria2://2897717e-55b6-4d3d-8752-72c5fd4614ae@it1.velion.pw:8443/?sni=it1.velion.pw#%F0%9F%87%AE%F0%9F%87%B9%20Velion%20IT-01
+hysteria2://bf433e9e-ee6a-42f8-b640-89056446bcbf@lt1.velion.pw:8443/?sni=lt1.velion.pw#%F0%9F%87%B1%F0%9F%87%B9%20Velion%20LT-01
+hysteria2://85d5479b-976e-4b75-a885-901d8babb64e@pl1.velion.pw:8443/?sni=pl1.velion.pw#%F0%9F%87%B5%F0%9F%87%B1%20Velion%20PL-02
