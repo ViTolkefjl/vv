@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Мои VPN-подписки</title>
+<style>
+  :root{
+    --bg:#0e1116; --card:#171b22; --card2:#1f242d; --line:#2a313c;
+    --text:#e8edf4; --muted:#9aa6b6; --accent:#4f8cff; --accent2:#3bd6a4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#1a2333 0%,var(--bg) 55%);color:var(--text);
+    min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px}
+  .wrap{width:100%;max-width:560px}
+  .head{text-align:center;margin-bottom:22px}
+  .logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+  .sub-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .sub-title{font-size:17px;font-weight:700}
+  .sub-count{color:var(--muted);font-size:13px;white-space:nowrap}
+  .cta{display:block;text-align:center;text-decoration:none;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;font-size:16px;font-weight:700;padding:14px;border-radius:12px}
+  .cta:active{filter:brightness(.95)}
+  .urlrow{display:flex;gap:8px;margin-top:12px}
+  input.url{flex:1;min-width:0;background:var(--card2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:10px 12px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace}
+  button{cursor:pointer;border:none;border-radius:10px;font-size:14px;font-weight:600;padding:10px 14px;transition:.15s}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--line);width:100%;margin-top:10px}
+  .btn-ghost:hover{border-color:var(--accent)}
+  .qr{display:none;justify-content:center;padding:18px;background:#fff;border-radius:14px;margin-top:12px}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:8px;line-height:1.6}
+  #empty{color:var(--muted);text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="logo">🛡️</div>
+    <h1>Мои VPN-подписки</h1>
+    <p class="sub">Открой нужную и жми «Добавить в Happ»</p>
+  </div>
+
+  <div id="list"><div id="empty">Загружаю подписки…</div></div>
+
+  <p class="foot">Личные подписки. Не делись ссылками публично.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  // какие файлы подписок искать рядом с этой страницей
+  var CANDIDATES = ["sub","sub-2","sub-3","sub-4","sub-5","sub-6","sub-7","sub-8"];
+
+  var HAPP_PUBKEY =
+"-----BEGIN PUBLIC KEY-----\n"+
+"MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAlBetA0wjbaj+h7oJ/d/h\n"+
+"pNrXvAcuhOdFGEFcfCxSWyLzWk4SAQ05gtaEGZyetTax2uqagi9HT6lapUSUe2S8\n"+
+"nMLJf5K+LEs9TYrhhBdx/B0BGahA+lPJa7nUwp7WfUmSF4hir+xka5ApHjzkAQn6\n"+
+"cdG6FKtSPgq1rYRPd1jRf2maEHwiP/e/jqdXLPP0SFBjWTMt/joUDgE7v/IGGB0L\n"+
+"Q7mGPAlgmxwUHVqP4bJnZ//5sNLxWMjtYHOYjaV+lixNSfhFM3MdBndjpkmgSfmg\n"+
+"D5uYQYDL29TDk6Eu+xetUEqry8ySPjUbNWdDXCglQWMxDGjaqYXMWgxBA1UKjUBW\n"+
+"wbgr5yKTJ7mTqhlYEC9D5V/LOnKd6pTSvaMxkHXwk8hBWvUNWAxzAf5JZ7EVE3jt\n"+
+"0j682+/hnmL/hymUE44yMG1gCcWvSpB3BTlKoMnl4yrTakmdkbASeFRkN3iMRewa\n"+
+"IenvMhzJh1fq7xwX94otdd5eLB2vRFavrnhOcN2JJAkKTnx9dwQwFpGEkg+8U613\n"+
+"+Tfm/f82l56fFeoFN98dD2mUFLFZoeJ5CG81ZeXrH83niI0joX7rtoAZIPWzq3Y1\n"+
+"Zb/Zq+kK2hSIhphY172Uvs8X2Qp2ac9UoTPM71tURsA9IvPNvUwSIo/aKlX5KE3I\n"+
+"VE0tje7twWXL5Gb1sfcXRzsCAwEAAQ==\n"+
+"-----END PUBLIC KEY-----";
+
+  function happLink(url){
+    try{
+      var enc=new JSEncrypt(); enc.setPublicKey(HAPP_PUBKEY);
+      var c=enc.encrypt(url);
+      return c ? ('happ://crypt4/'+c) : url;
+    }catch(e){ return url; }
+  }
+
+  function parseMeta(text){
+    var title=null, count=0;
+    text.split(/\r?\n/).forEach(function(l){
+      var m=l.match(/^#\s*profile-title:\s*(.+)$/i);
+      if(m) title=m[1].trim();
+      if(/^(vless|vmess|trojan|ss|hysteria2|hy2):\/\//.test(l.trim())) count++;
+    });
+    return {title:title, count:count};
+  }
+
+  function makeCard(meta, subUrl){
+    var card=document.createElement('div'); card.className='card';
+    var head=document.createElement('div'); head.className='sub-head';
+    head.innerHTML='<span class="sub-title"></span><span class="sub-count">'+meta.count+' серв.</span>';
+    head.querySelector('.sub-title').textContent=meta.title;
+    var a=document.createElement('a'); a.className='cta'; a.textContent='➕ Добавить в Happ';
+    a.href=happLink(subUrl);
+    var row=document.createElement('div'); row.className='urlrow';
+    var inp=document.createElement('input'); inp.className='url'; inp.readOnly=true; inp.value=subUrl;
+    var cp=document.createElement('button'); cp.className='btn-primary'; cp.textContent='Копировать';
+    cp.onclick=function(){ navigator.clipboard.writeText(subUrl).then(function(){
+        cp.textContent='✓'; setTimeout(function(){cp.textContent='Копировать';},1500); }); };
+    row.appendChild(inp); row.appendChild(cp);
+    var qb=document.createElement('button'); qb.className='btn-ghost'; qb.textContent='QR-код';
+    var qr=document.createElement('div'); qr.className='qr'; var built=false;
+    qb.onclick=function(){ if(!built){ new QRCode(qr,{text:subUrl,width:200,height:200,correctLevel:QRCode.CorrectLevel.M}); built=true; }
+      var sh=qr.style.display==='flex'; qr.style.display=sh?'none':'flex'; qb.textContent=sh?'QR-код':'Скрыть QR'; };
+    card.appendChild(head); card.appendChild(a); card.appendChild(row); card.appendChild(qb); card.appendChild(qr);
+    return card;
+  }
+
+  (function load(){
+    var list=document.getElementById('list');
+    var jobs=CANDIDATES.map(function(name){
+      var url=new URL(name, location.href).href;
+      return fetch(url).then(function(r){ return r.ok ? r.text() : null; })
+        .then(function(t){ if(!t) return null; var m=parseMeta(t); if(m.count===0) return null;
+          if(!m.title) m.title=name; return {meta:m, url:url}; })
+        .catch(function(){ return null; });
+    });
+    Promise.all(jobs).then(function(res){
+      var found=res.filter(Boolean);
+      list.innerHTML='';
+      if(found.length===0){ list.innerHTML='<div id="empty">Подписки не найдены. Заполни наборы и пересобери.</div>'; return; }
+      found.forEach(function(x){ list.appendChild(makeCard(x.meta, x.url)); });
+    });
+  })();
+</script>
+</body>
+</html>
